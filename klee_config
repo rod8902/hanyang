@@ -1,0 +1,12 @@
+# llvm config
+export C_INCLUDE_PATH=/usr/include/i386-linux-gnu
+export CPLUS_INCLUDE_PATH=/usr/include/i386-linux-gnu
+export PATH=$PATH:~/etri/llvm-gcc/bin:~/etri/llvm/Release+Asserts/bin
+
+# ndds 
+export NDDSHOME=~/etri/RTI/ndds.5.1.0
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/etri/RTI/ndds.5.1.0/lib/i86Linux3.xgcc4.6.3
+
+# klee
+export PATH=$PATH:~/etri/klee/Release+Asserts/bin
+
