@@ -1,9 +1,0 @@
-Error: memory error: out of bound pointer
-Stack: 
-	#000000150 in main ()
-Info: 
-	address: 171522528
-	next: object at 3074938552 of size 4
-		MO0[4] (no allocation info)
-	prev: object at 171494768 of size 1024
-		MO39[1024] allocated at main():  %sample = alloca [1024 x i8], align 1
