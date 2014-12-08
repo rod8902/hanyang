@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config transient="false">
+	<site policy="USER-EXCLUDE" enabled="true" url="platform:/base/" updateable="true">
+		<feature url="features/org.eclipse.rcp.source_3.5.0.v20090519-9SA0FwxFv6x089WEf-TWh11/" id="org.eclipse.rcp.source" version="3.5.0.v20090519-9SA0FwxFv6x089WEf-TWh11">
+		</feature>
+		<feature url="features/org.eclipse.equinox.p2.user.ui_1.1.0.v20090605-1440-7u6Fb3FbPbJP5MjJjZgifk/" id="org.eclipse.equinox.p2.user.ui" version="1.1.0.v20090605-1440-7u6Fb3FbPbJP5MjJjZgifk">
+		</feature>
+		<feature url="features/org.eclipse.jdt_3.5.0.v20090527-2000-7r88FEeFJePyvYeA33DjZ_c1/" id="org.eclipse.jdt" version="3.5.0.v20090527-2000-7r88FEeFJePyvYeA33DjZ_c1">
+		</feature>
+		<feature url="features/org.eclipse.help.source_1.1.0.v20090602-7e7eFAlFEx2XZoYqwI68e2F/" id="org.eclipse.help.source" version="1.1.0.v20090602-7e7eFAlFEx2XZoYqwI68e2F">
+		</feature>
+		<feature url="features/org.eclipse.pde.source_3.5.0.v20090123-7Z7_F8NFE-z0VXhWiu-8Qb95/" id="org.eclipse.pde.source" version="3.5.0.v20090123-7Z7_F8NFE-z0VXhWiu-8Qb95">
+		</feature>
+		<feature url="features/org.eclipse.platform.source_3.5.0.v20090611a-9gEeG1HFtQcmRThO4O3aR_fqSMvJR2sJ/" id="org.eclipse.platform.source" version="3.5.0.v20090611a-9gEeG1HFtQcmRThO4O3aR_fqSMvJR2sJ">
+		</feature>
+		<feature url="features/org.eclipse.rcp_3.5.0.v20090519-9SA0FwxFv6x089WEf-TWh11/" id="org.eclipse.rcp" version="3.5.0.v20090519-9SA0FwxFv6x089WEf-TWh11">
+		</feature>
+		<feature url="features/org.eclipse.cvs.source_1.1.100.v20090514-7E79FEc9BJ99r9YFR6JOEF/" id="org.eclipse.cvs.source" version="1.1.100.v20090514-7E79FEc9BJ99r9YFR6JOEF">
+		</feature>
+		<feature plugin-identifier="org.eclipse.help.base" url="features/org.eclipse.help_1.1.0.v20090602-7e7eFAlFEx2XZoYqwI68e2F/" id="org.eclipse.help" version="1.1.0.v20090602-7e7eFAlFEx2XZoYqwI68e2F">
+		</feature>
+		<feature url="features/org.eclipse.platform_3.5.0.v20090611a-9gEeG1HFtQcmRThO4O3aR_fqSMvJR2sJ/" id="org.eclipse.platform" version="3.5.0.v20090611a-9gEeG1HFtQcmRThO4O3aR_fqSMvJR2sJ">
+		</feature>
+		<feature url="features/org.eclipse.equinox.p2.user.ui.source_1.1.0.v20090605-1440-7u6Fb3FbPbJP5MjJjZgifk/" id="org.eclipse.equinox.p2.user.ui.source" version="1.1.0.v20090605-1440-7u6Fb3FbPbJP5MjJjZgifk">
+		</feature>
+		<feature url="features/org.eclipse.pde_3.5.0.v20090123-7Z7_F8NFE-z0VXhWiu-8Qb95/" id="org.eclipse.pde" version="3.5.0.v20090123-7Z7_F8NFE-z0VXhWiu-8Qb95">
+		</feature>
+		<feature url="features/org.eclipse.sdk_3.5.0.v20090423-7Q7bA7DPQ1SM6OYQ7wKYJhI-z-xZJCmLTBRhtZ0o61b1z/" id="org.eclipse.sdk" version="3.5.0.v20090423-7Q7bA7DPQ1SM6OYQ7wKYJhI-z-xZJCmLTBRhtZ0o61b1z">
+		</feature>
+		<feature url="features/org.eclipse.jdt.source_3.5.0.v20090527-2000-7r88FEeFJePyvYeA33DjZ_c1/" id="org.eclipse.jdt.source" version="3.5.0.v20090527-2000-7r88FEeFJePyvYeA33DjZ_c1">
+		</feature>
+		<feature url="features/org.eclipse.cvs_1.1.100.v20090514-7E79FEc9BJ99r9YFR6JOEF/" id="org.eclipse.cvs" version="1.1.100.v20090514-7E79FEc9BJ99r9YFR6JOEF">
+		</feature>
+	</site>
+</config>

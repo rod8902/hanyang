@@ -1,0 +1,128 @@
+#!/bin/sh
+
+filename=$0
+
+optsstring="l:"
+
+# echo "Number of CLI arguments: $#"
+
+ignore_next=false
+for arg in $* 
+do
+	if [ $ignore_next == "true" ]; then
+		ignore_next=false
+		continue
+	fi
+	echo "Argument: $arg"
+	case $arg in
+    	"-licenseFile")
+      		shift
+      		RTI_LICENSE_FILE=$1
+		shift
+		ignore_next=true
+      	;;
+      	*)
+      		databaseFile=$arg
+      		shift
+      	;;
+  esac
+done
+
+export RTI_LICENSE_FILE
+
+scriptDir=`dirname "$filename"`
+
+# Checks whether the running file is a symlink. If it is, it returns the directory 
+# of the file the symlink points to.
+if [ -L $0 ]
+then
+    scriptDir=`dirname \`readlink -f $filename\``
+fi
+
+RTI_DDR_ROOT_DIR=$scriptDir/..
+
+RTI_DDR_VERSION=5.1.0
+RTI_DDR_HOME=$RTI_DDR_ROOT_DIR/console
+RTI_DDR_BIN_DIR=$RTI_DDR_ROOT_DIR/bin
+JRE_HOME=$RTI_DDR_ROOT_DIR/jre/java-linux
+RTI_JAVA=$JRE_HOME/bin/java
+
+export LD_LIBRARY_PATH=$RTI_DDR_ROOT_DIR/lib/i86Linux2.6gcc4.1.1jdk:$JRE_HOME/lib/i386:$LD_LIBRARY_PATH
+export NDDSHOME=$RTI_DDR_ROOT_DIR
+
+# Get Bin directory
+os=`uname -s`
+processor=`uname -m`
+platformName=unknown
+
+# RTI Platforms to Try
+i86Linux26Platforms=`ls -1 $RTI_DDR_BIN_DIR/ | grep i86Linux2.6`
+x64Linux26Platforms=`ls -1 $RTI_DDR_BIN_DIR/ | grep x64Linux2.6`
+i86SusePlatforms=`ls -1 $RTI_DDR_BIN_DIR/ | grep i86Suse`
+x64SusePlatforms=`ls -1 $RTI_DDR_BIN_DIR/ | grep x64Suse`
+i86RedHawk51Platforms=`ls -1 $RTI_DDR_BIN_DIR/ | grep i86RedHawk5.1`
+
+# Recording Console only supports Linux
+if [ "$os" != "Linux" ]
+then
+    echo "OS $os not supported. Please contact support@rti.com."
+    exit
+fi
+
+# Recording Console only supports 32-bit Linux and x86_64 machines with 32-bit runtime libraries.
+if [ "$processor" = "i686" ]
+then    
+    platformsToTry="$i86Linux26Platforms $i86SusePlatforms $i86RedHawk51Platforms"
+elif [ "$processor" = "x86_64" ]
+then
+    platformsToTry="$x64Linux26Platforms $x64SusePlatforms $i86Linux26Platforms $i86SusePlatforms"
+else
+    echo Processor $os not supported. Please contact support@rti.com
+    exit
+fi
+
+for platform in $platformsToTry
+do
+    #echo Trying $platform
+    if [ -x "$RTI_DDR_BIN_DIR/$platform/rtirecord" ] 
+    then
+       platformName=$platform
+       break;
+    fi
+done
+
+if [ "$platformName" = "unknown" ]
+then
+    echo Could not find the the rtirecord executable.
+    echo Please examine RTI_Recording_Servce_$RTI_DDR_VERSION/bin/<arch> to
+    echo find the executable for rtirecord and rtireplay. If rtirecord or
+    echo rtireplay are not in your bin directory, please contact support@rti.com. 
+    exit
+fi
+
+# Create workspace directory if it does not exist
+WORKSPACE_DIR=$HOME/rti/workspaces/RTI_Recording_Service_$RTI_DDR_VERSION
+mkdir -p $WORKSPACE_DIR
+# Copy dds_interface_qos_profiles.xml file if it does not exist
+if [ ! -x $WORKSPACE_DIR/dds_interface_qos_profiles.xml ]
+then
+    cp $RTI_DDR_HOME/configurationFiles/dds_interface_qos_profiles.xml \
+       $WORKSPACE_DIR/
+fi
+
+
+# Run application
+$RTI_DDR_HOME/RTI_recording_console -vm "$RTI_JAVA" \
+    -data "$WORKSPACE_DIR" \
+    -vmargs \
+    -Dbin.dir="$RTI_DDR_BIN_DIR/$platformName" \
+    -Ddoc.dir="$RTI_DDR_ROOT_DIR/doc" \
+    -Dexamples.dir="$RTI_DDR_ROOT_DIR/examples"
+
+if [ $? != 0 -a "$processor" = "x86_64" ]
+then
+    echo You may be missing 32-bit runtime libraries in your 64-bit Linux machine. 
+    echo RTI Console will not run without 32-bit runtime libraries. You will find
+    echo instructions on how to install these libraries in the Release Notes.
+    echo For more information contact support@rti.com.
+fi

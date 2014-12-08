@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\schema\rti_routing_service.xsd">
+
+    <routing_service name="bridge_domain_0_and_domain_1">
+        <annotation>
+            <documentation>
+                Routes all topics from domain 0 to domain 1 and the other way around using RELIABLE QoS
+            </documentation>
+        </annotation>
+        
+        <!-- The administration tag enables remote administration, and is required 
+			when using Admin Console. -->
+		<administration>
+			<domain_id>0 </domain_id>
+			<distributed_logger>
+				<enabled>true</enabled>
+				<filter_level>WARNING</filter_level>
+			</distributed_logger>
+		</administration>
+        
+        <!-- This is the Monitoring configuration for all the entities in this 
+			routing service, and is required when using Admin Console. -->
+		<monitoring>
+			<!-- The domain id where to publish the monitoring information -->
+			<domain_id>0</domain_id>
+			<!-- How often to publish it -->
+			<status_publication_period>
+				<sec>5</sec>
+				<nanosec>0</nanosec>
+			</status_publication_period>
+			<!-- How often to compute statistics -->
+			<statistics_sampling_period>
+				<sec>1</sec>
+				<nanosec>0</nanosec>
+			</statistics_sampling_period>
+			<participant_qos>
+				<participant_name>
+					<name>RoutingService</name>
+				</participant_name>
+            </participant_qos>
+        </monitoring>
+
+        <domain_route name="TwoWayDomainRoute">
+
+            <participant_1>
+                <domain_id>0</domain_id>
+            </participant_1>
+            
+            <participant_2>
+                <domain_id>1</domain_id>
+            </participant_2>
+
+            <session name="Session1">
+                <auto_topic_route name="AllForward">
+                    <publish_with_original_info>true</publish_with_original_info>
+                    <input participant="1">
+                        <allow_topic_name_filter>*</allow_topic_name_filter>
+                        <allow_registered_type_name_filter>*</allow_registered_type_name_filter>
+                        <creation_mode>ON_DOMAIN_AND_ROUTE_MATCH</creation_mode>
+                    </input>
+                    <output>
+                        <allow_topic_name_filter>*</allow_topic_name_filter>
+                        <allow_registered_type_name_filter>*</allow_registered_type_name_filter>
+                        <creation_mode>ON_DOMAIN_AND_ROUTE_MATCH</creation_mode>
+                    </output>
+                </auto_topic_route>
+            </session>
+
+            <session name="Session2">
+                <auto_topic_route name="AllBackward">
+                    <publish_with_original_info>true</publish_with_original_info>
+                    <input participant="2">
+                        <allow_topic_name_filter>*</allow_topic_name_filter>
+                        <allow_registered_type_name_filter>*</allow_registered_type_name_filter>
+                        <creation_mode>ON_DOMAIN_AND_ROUTE_MATCH</creation_mode>
+                        <datareader_qos>
+                          <reliability>
+                            <kind>RELIABLE_RELIABILITY_QOS</kind>
+                          </reliability>
+                        </datareader_qos>
+                    </input>
+                    <output>
+                        <allow_topic_name_filter>*</allow_topic_name_filter>
+                        <allow_registered_type_name_filter>*</allow_registered_type_name_filter>
+                        <creation_mode>ON_DOMAIN_AND_ROUTE_MATCH</creation_mode>
+                        <datawriter_qos>
+                          <reliability>
+                            <kind>RELIABLE_RELIABILITY_QOS</kind>
+                          </reliability>
+                        </datawriter_qos>
+                    </output>
+                </auto_topic_route>
+            </session>
+            
+        </domain_route>
+    </routing_service>
+
+</dds>
+

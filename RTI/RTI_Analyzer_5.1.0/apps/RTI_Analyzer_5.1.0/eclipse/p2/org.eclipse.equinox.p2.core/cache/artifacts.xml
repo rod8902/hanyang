@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<repository name='download cache' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1.0.0'>
+  <properties size='2'>
+    <property name='p2.system' value='true'/>
+    <property name='p2.timestamp' value='1244759978910'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='5'>
+    <artifact classifier='binary' id='org.eclipse.platform_root' version='3.5.0.v20090611a-9gEeG1HFtQcmRThO4O3aR_fqSMvJR2sJ'>
+      <properties size='2'>
+        <property name='download.size' value='39178'/>
+        <property name='artifact.size' value='39178'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.jdt_root' version='3.5.0.v20090527-2000-7r88FEeFJePyvYeA33DjZ_c1'>
+      <properties size='2'>
+        <property name='download.size' value='8076'/>
+        <property name='artifact.size' value='8076'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp_root' version='3.5.0.v20090519-9SA0FwxFv6x089WEf-TWh11'>
+      <properties size='2'>
+        <property name='download.size' value='39178'/>
+        <property name='artifact.size' value='39178'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.rcp.configuration_root.gtk.linux.x86' version='1.0.0.I20090611-1540'>
+      <properties size='2'>
+        <property name='download.size' value='184788'/>
+        <property name='artifact.size' value='184788'/>
+      </properties>
+    </artifact>
+    <artifact classifier='binary' id='org.eclipse.cvs_root' version='1.1.100.v20090514-7E79FEc9BJ99r9YFR6JOEF'>
+      <properties size='2'>
+        <property name='download.size' value='8076'/>
+        <property name='artifact.size' value='8076'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>

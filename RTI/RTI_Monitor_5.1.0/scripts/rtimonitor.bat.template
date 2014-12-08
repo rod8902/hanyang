@@ -1,0 +1,89 @@
+@ECHO OFF
+@REM $Id: rtimonitor.bat.template,v 1.2 2013/10/24 22:15:49 ken Exp $
+@REM
+@REM (c) Copyright, Real-Time Innovations, $Date: 2013/10/24 22:15:49 $.
+@REM All rights reserved.
+@REM
+@REM No duplications, whole or partial, manual or electronic, may be made
+@REM without express written permission.  Any such copies, or
+@REM revisions thereof, must display this notice unaltered.
+@REM This code contains trade secrets of Real-Time Innovations, Inc.
+@REM
+@REM modification history
+@REM --------------------
+@REM 
+@REM =====================================================================
+
+setlocal
+
+REM BASE_DIR: the directory which holds the version of RTI Monitor distribution 
+
+set BASE_DIR=%~dp0\..
+
+REM RTI_DDS_DIR: the directory which holds the version of RTI Data Distribution 
+REM Service that is to be used
+
+
+IF NOT DEFINED RTI_DDS_DIR (
+    set RTI_DDS_DIR="%BASE_DIR%"
+)
+REM Remove any existing quotes
+set RTI_DDS_DIR=%RTI_DDS_DIR:"=%
+
+
+REM RTI_DDS_JAVA_ARCH: the platform's java architecture.
+REM For example, i86Win32jdk
+
+IF NOT DEFINED RTI_DDS_JAVA_ARCH (
+    IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
+        set RTI_DDS_JAVA_ARCH=x64Win64jdk
+    ) ELSE (
+        set RTI_DDS_JAVA_ARCH=i86Win32jdk
+    )
+)
+
+
+REM RTI_JAVA_DIR: the directory which contains the Java Runtime Environment to
+REM be used
+
+IF NOT DEFINED RTI_JAVA_DIR (
+    IF "%PROCESSOR_ARCHITECTURE%"=="AMD64" (
+        set RTI_JAVA_DIR="%BASE_DIR%"\jre\x64Win64\bin
+    ) ELSE (
+        set RTI_JAVA_DIR="%BASE_DIR%"\jre\i86Win32\bin
+    )
+)
+REM Remove any existing quotes
+set RTI_JAVA_DIR=%RTI_JAVA_DIR:"=%
+
+
+REM DEBUG_LIBS: a quick way to enable debug libraries. 
+REM             set this to 'd' (without the ticks) to enable them.
+set DEBUG_LIBS=
+
+REM ---------------------------------------------------------------------------
+
+REM The variables below generally do not have to be adjusted
+
+set RTI_DDS_JAR="%RTI_DDS_DIR%\class\nddsjava%DEBUG_LIBS%.jar"
+set MONITOR_JAR="%BASE_DIR%\lib\rtimonitor%DEBUG_LIBS%.jar"
+set MONITOR_LIB_JAR="%BASE_DIR%\lib\rtiddsmonitorlib%DEBUG_LIBS%.jar"
+set JFREECHART_JARS="%BASE_DIR%\lib\jcommon-1.0.16.jar";"%BASE_DIR%\lib\jfreechart-1.0.13.jar"
+set LOG4J_JAR="%BASE_DIR%\lib\log4j-1.2.9.jar"
+set SWINGX_JAR="%BASE_DIR%\lib\swingx-1.6.jar"
+set DISTLOGDATAMODEL_JAR="%BASE_DIR%\lib\distlogdatamodel.jar"
+set JAVA_CLASSPATH=%MONITOR_JAR%;%JFREECHART_JARS%;%LOG4J_JAR%;%SWINGX_JAR%;%DISTLOGDATAMODEL_JAR%;%MONITOR_LIB_JAR%;%RTI_DDS_JAR%
+
+REM Set the path so that the DDS libraries can be loaded
+set RTI_DDS_JAVA_DIR=%BASE_DIR%\lib\%RTI_DDS_JAVA_ARCH%
+set PATH=%RTI_DDS_JAVA_DIR%;%PATH%
+
+REM Make the QoS profile file available to DDS
+set NDDS_QOS_PROFILES=%BASE_DIR%\config\rtimonitor_qos_profiles.xml
+
+REM The Monitor Application does not take a license parameter so need to make sure not to pass it on
+
+set RTI_MONITOR_VERSION=#PRODUCT_VERSION#
+FOR /F "tokens=2*" %%a in ('REG QUERY "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Shell Folders" /v "Personal"') DO SET my_docs=%%b
+
+start  "RTI Monitor UI Command Window" /B "%RTI_JAVA_DIR%\javaw.exe" -Xmx500m -classpath %JAVA_CLASSPATH% -DRTI_MONITOR_DIR="%BASE_DIR%" -DRTI_MONITOR_LOG_DIR="%my_docs%\RTI\RTI Monitor %RTI_MONITOR_VERSION%" com.rti.dds.monitor.ui.DdsMonitorManager %*

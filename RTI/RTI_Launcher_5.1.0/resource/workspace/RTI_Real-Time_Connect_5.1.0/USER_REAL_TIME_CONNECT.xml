@@ -1,0 +1,393 @@
+<?xml version="1.0"?>
+<dds version="5.1.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../schema/rti_real_time_connect.xsd">
+
+    <!-- 
+    ********************************************************************
+    Default quality of service profile
+    ******************************************************************** 
+    -->
+    <qos_library name="RtiRealTimeConnectProfilesLibraryUser">
+
+        <!-- Default QoS Profile 
+             This is the default QoS profile used to create DDS entities in 
+             RTI Real-Time Connect.
+             
+             The values in this profile will be overwritten when:
+             
+             - The column profile_name in the RTI_DDS_PUBLICATIONS and
+             RTI_DDS_SUBSCRIPTIONS tables is set to a value different than 
+             NULL.
+             
+             - The QoS values configurable using the RTI_DDS_PUBLICATIONS and
+             RTI_DDS_SUBSCRIPTIONS tables are set to values different than 
+             NULL.
+             
+             - The is_default_qos attribute is set to true in a different 
+             profile defined in this file or any other file referenced by the
+             INI attribute ProfileFile.
+            -->
+        <qos_profile name="DefaultProfileUser" is_default_qos="true">
+
+            <!-- Default Participant QoS for RTI Real-Time Connect 
+                 Participants creation is triggered after adding entries to 
+                 the RTIDDS_SUBSCRIPTIONS and RTIDDS_PUBLICATIONS tables.
+            -->
+            <participant_qos>
+                <resource_limits>
+                    <type_code_max_serialized_length>4096</type_code_max_serialized_length>
+                </resource_limits>
+
+                <property>
+                    <value>
+                        <!--
+                        Configure UDPv4 transport:
+                        -->
+                        <element>
+                            <!--
+                            If possible, increase the UDP send socket buffer
+                            size. This will allow you to send multiple large
+                            packets without UDP send errors.
+
+                            On some platforms (e.g. Linux), this value is
+                            limited by a system-wide policy. Setting it to
+                            a larger value will fail silently; the value will
+                            be set to the maximum allowed by that policy.
+                            -->
+                            <name>dds.transport.UDPv4.builtin.send_socket_buffer_size</name>
+                            <value>524288</value>
+                            <!-- 512 KB -->
+                        </element>
+                        <element>
+                            <!--
+                            If possible, increase the UDP receive socket
+                            buffer size. This will allow you to receive
+                            multiple large packets without UDP receive errors.
+
+                            On some platforms (e.g. Linux), this value is
+                            limited by a system-wide policy. Setting it to
+                            a larger value will fail silently; the value will
+                            be set to the maximum allowed by that policy.
+                            -->
+                            <name>dds.transport.UDPv4.builtin.recv_socket_buffer_size</name>
+                            <value>2097152</value>
+                            <!-- 2 MB -->
+                        </element>
+
+                        <!--
+                        Configure shared memory transport:
+                        -->
+                        <!--
+                        <element>
+                            <name>dds.transport.shmem.builtin.receive_buffer_size</name>
+                            <value>2097152</value>
+                        </element>
+                        <element>
+                            <name>dds.transport.shmem.builtin.received_message_count_max</name>
+                            <value>2048</value>
+                        </element>
+                        -->
+                    </value>
+                </property>
+            </participant_qos>
+
+            <!-- Default Subscriber QoS for RTI Real-Time Connect -->
+            <subscriber_qos>
+                <presentation>
+                    <coherent_access>false</coherent_access>
+                </presentation>
+            </subscriber_qos>
+
+            <!-- Default DataReader QoS Profile.
+                 DataReaders are created after adding entries to the 
+                 RTIDDS_SUBSCRIPTIONS table.
+            -->
+            <datareader_qos>
+                <reliability>
+                    <!--
+                    Enable reliability.
+                    -->
+                    <kind>RELIABLE_RELIABILITY_QOS</kind>
+                </reliability>
+
+                <history>
+                    <!--
+                    To implement strict reliability, we need to set the
+                    history to KEEP_ALL. That way, unacknowledged samples
+                    will not be overwritten.
+                    -->
+                    <kind>KEEP_ALL_HISTORY_QOS</kind>
+                </history>
+
+                <!--
+                The following parameters tune the behavior of the reliability
+                protocol. Setting them is not required in order to achieve
+                strict reliability but is beneficial from a performance
+                standpoint. 
+                -->
+                <protocol>
+                    <rtps_reliable_reader>
+                        <!--
+                        When the DataReader receives a heartbeat from a
+                        DataWriter (indicating (a) that the DataWriter still
+                        exists on the network and (b) what sequence numbers
+                        it has published), the following parameters indicate
+                        how long it will wait before replying with a positive
+                        (assuming they aren't disabled) or negative
+                        acknowledgement.
+
+                        The time the reader waits will be a random duration
+                        in between the minimum and maximum values. Narrowing
+                        this range, and shifting it towards zero, will make
+                        the system more reactive. However, it will increase
+                        the chance of (N)ACK spikes. The higher the number of
+                        readers on the topic, and the greater the load on
+                        your network, the more you should consider specifying
+                        a range here.
+                        -->
+                        <min_heartbeat_response_delay>
+                            <sec>0</sec>
+                            <nanosec>0</nanosec>
+                        </min_heartbeat_response_delay>
+                        <max_heartbeat_response_delay>
+                            <sec>0</sec>
+                            <nanosec>0</nanosec>
+                        </max_heartbeat_response_delay>
+                    </rtps_reliable_reader>
+                </protocol>
+            </datareader_qos>
+
+            <!-- Default DataWriter QoS Profile.
+                 DataWriters are created after adding entries to the 
+                 RTIDDS_PUBLICATIONS table.
+            -->
+            <datawriter_qos>
+                <reliability>
+                    <!--
+                    Enable reliability.
+                    -->
+                    <kind>RELIABLE_RELIABILITY_QOS</kind>
+                    <!-- 
+                    The maximum time a DataWriter may block on a write() call
+                    waiting for space to become available
+                    -->
+                    <max_blocking_time>
+                        <sec>20</sec>
+                        <nanosec>0</nanosec>
+                    </max_blocking_time>
+                </reliability>
+
+                <resource_limits>
+                    <!--
+                    The number of data samples for which the DataWriter will
+                    allocate space.
+                    -->
+                    <max_samples>LENGTH_UNLIMITED</max_samples>
+                    <!--
+                    The number of data instances for which the DataWriter will
+                    allocate space.
+                    -->
+                    <max_instances>LENGTH_UNLIMITED</max_instances>
+                </resource_limits>
+
+                <history>
+                    <!--
+                    To implement strict reliability, we need to set the
+                    history to KEEP_ALL. That way, undelivered samples
+                    will not be overwritten.
+                    -->
+                    <kind>KEEP_ALL_HISTORY_QOS</kind>
+                </history>
+
+                <destination_order>
+                    <!-- 
+                    This value ensures that all DataReaders
+                    will end up with the same final value for the instances.
+                    
+                    In table replication scenarios this setting is used
+                    to provide conflict resolution.
+                    
+                    The DataReaders must also set the value to
+                    BY_SOURCE_TIMESTAMP_DESTINATIONORDER_QOS.
+                    -->
+                    <kind>BY_SOURCE_TIMESTAMP_DESTINATIONORDER_QOS</kind>
+                    <source_timestamp_tolerance>
+                        <sec>0</sec>
+                        <nanosec>0</nanosec>
+                    </source_timestamp_tolerance>
+                </destination_order>
+
+                <!--
+                The following parameters tune the behavior of the reliability
+                protocol. Setting them is not required in order to achieve
+                strict reliability but is beneficial from a performance
+                standpoint. 
+                -->
+                <protocol>
+                    <rtps_reliable_writer>
+                        <!--
+                        If the number of samples in the writer's cache hasn't
+                        risen to high_watermark, this is the rate at which
+                        the DataWriter will send out periodic heartbeats.
+                        -->
+                        <heartbeat_period>
+                            <sec>1</sec>
+                            <nanosec>0</nanosec>
+                        </heartbeat_period>
+
+                        <!--
+                        If the number of samples in the writer's cache has
+                        risen to high_watermark, and has not yet fallen to
+                        low_watermark, this is the rate at which the writer
+                        will send periodic heartbeats to its readers.
+                        -->
+                        <fast_heartbeat_period>
+                            <!-- 100 milliseconds: -->
+                            <sec>0</sec>
+                            <nanosec>100000000</nanosec>
+                        </fast_heartbeat_period>
+
+                        <!--
+                        If a durable reader starts up after the writer
+                        already has some samples in its cache, this is the
+                        rate at which it will heartbeat the new reader. It
+                        should generally be a shorter period of time than the
+                        normal heartbeat period in order to help the new
+                        reader catch up.
+                        -->
+                        <late_joiner_heartbeat_period>
+                            <!-- 100 milliseconds: -->
+                            <sec>0</sec>
+                            <nanosec>100000000</nanosec>
+                        </late_joiner_heartbeat_period>
+
+                        <!--
+                        If the number of samples in the writer's cache has
+                        risen to high_watermark, and has not yet fallen to
+                        low_watermark, the writer will start sending periodic
+                        heartbeats using the fast heartbeat period.                        
+                        -->
+                        <high_watermark>28</high_watermark>
+                        <low_watermark>3</low_watermark>
+
+                        <!--
+                        The number of times a reliable writer will send a
+                        heartbeat to a reader without receiving a response
+                        before it will consider the reader to be inactive and
+                        no longer await acknowledgements before discarding
+                        sent data.
+
+                        On a non-real-time operating system like Windows or
+                        Linux, a poorly behaving process could monopolize the
+                        CPU for several seconds. Therefore, in many cases a
+                        value that yields a "grace period" of several seconds
+                        is a good choice.
+                        -->
+                        <max_heartbeat_retries>108</max_heartbeat_retries>
+
+                        <!--
+                        When a DataWriter receives a negative acknowledgement
+                        (NACK) from a DataReader for a particular data sample,
+                        it will send a repair packet to that reader.
+
+                        The amount of time the writer waits between receiving
+                        the NACK and sending the repair will be a random
+                        value in between the minimum and maximum values
+                        specified here. Narrowing the range, and shifting it
+                        towards zero, will make the writer more reactive.
+                        However, by leaving some delay, you increase the
+                        chances that the writer will learn of additional
+                        readers that missed the same data, in which case it
+                        will be able to send a single multicast repair
+                        instead of multiple unicast repairs, thereby using
+                        the available network bandwidth more efficiently. The
+                        higher the number of readers on the topic, and the
+                        greater the load on your network, the more you should
+                        consider specifying a range here.
+                        -->
+                        <min_nack_response_delay>
+                            <sec>0</sec>
+                            <nanosec>0</nanosec>
+                        </min_nack_response_delay>
+                        <max_nack_response_delay>
+                            <sec>0</sec>
+                            <nanosec>0</nanosec>
+                        </max_nack_response_delay>
+
+                        <min_send_window_size>32</min_send_window_size>
+                        <!--
+                        The value below, then, effectively indicates how far
+                        ahead of the slowest reader the writer is able to get
+                        before it will block waiting for the reader(s) to catch
+                        up.
+                        -->
+                        <max_send_window_size>32</max_send_window_size>
+
+                        <max_bytes_per_nack_response>8192</max_bytes_per_nack_response>
+                    </rtps_reliable_writer>
+                </protocol>
+
+                <writer_data_lifecycle>
+                    <!-- 
+                    The DataWriter will not dispose instances when it finalizes.
+                    
+                    In table replication scenarios, this value must be set to false.
+                    Otherwise, when the RTC daemon finalizes the dispose of the instances would
+                    trigger row deletions in other RTC daemons.
+                    -->
+                    <autodispose_unregistered_instances>false</autodispose_unregistered_instances>
+                </writer_data_lifecycle>
+            </datawriter_qos>
+
+        </qos_profile>
+    </qos_library>
+
+    <!-- 
+    ********************************************************************
+    Real Time Connect configuration
+    ******************************************************************** 
+    -->
+
+    <real_time_connect name="defaultUser">
+
+        <annotation>
+            <documentation>Edit this file to use your database configuration</documentation>
+        </annotation>
+
+	<general_options>            
+            <administration>
+                <domain_id>0</domain_id>
+                <distributed_logger>
+                    <enabled>true</enabled>
+                    <filter_level>WARNING</filter_level>
+                </distributed_logger>
+            </administration>
+            <enable_table_replication>false</enable_table_replication>            
+	</general_options>
+
+        <database_mapping_options>
+            <identifier_separator_char>$</identifier_separator_char>
+            <open_bracket_char>[</open_bracket_char>
+            <close_bracket_char>]</close_bracket_char>
+        </database_mapping_options>
+
+        <mysql_connection>
+            <dsn>MySqlDsn</dsn>
+            <user_name>MyUsername</user_name>
+            <password>MyPassword</password>
+        </mysql_connection>
+
+        <oracle_connection>
+            <dsn>MyOracleDsn</dsn>
+            <user_name>MyUsername</user_name>
+            <password>MyPassword</password>
+        </oracle_connection>
+
+        <timesten_connection>
+            <dsn>MyTimesTenDsn</dsn>
+            <user_name>MyUsername</user_name>
+            <password>MyPassword</password>
+        </timesten_connection>
+
+    </real_time_connect>
+
+</dds>

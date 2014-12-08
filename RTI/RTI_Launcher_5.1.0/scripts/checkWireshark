@@ -1,0 +1,17 @@
+#!/bin/sh
+
+which wireshark > /dev/null 2>&1
+
+if [ "$?" -ne 1 ]; then
+    wiresharkPath=`which wireshark`    
+fi 
+
+if [ "$1" = "-checkInstalled" ]; then
+	if [ "$wiresharkPath" = "" ]; then            
+		exit 0	
+	else	                
+		exit 1
+    fi
+else 
+    exec wireshark
+fi 

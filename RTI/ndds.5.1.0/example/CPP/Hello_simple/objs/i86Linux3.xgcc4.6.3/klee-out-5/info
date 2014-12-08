@@ -1,0 +1,3 @@
+klee -load=../../../lib/i86Linux3.xgcc4.6.3/libnddscppz.so -load=../../../lib/i86Linux3.xgcc4.6.3/libnddscz.so -load=../../../lib/i86Linux3.xgcc4.6.3/libnddscorez.so objs/i86Linux3.xgcc4.6.3/HelloPublisher.o
+PID: 3328
+Started: 2014-12-08 14:39:26

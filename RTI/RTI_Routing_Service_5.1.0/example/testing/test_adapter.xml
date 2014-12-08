@@ -1,0 +1,360 @@
+<?xml version="1.0"?>
+<dds xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../resource/schema/rti_routing_service.xsd">
+
+
+    <!-- ****************************************************************** -->
+    <!-- RTI Routing Service                                                -->
+    <!-- ****************************************************************** -->
+
+    <!-- Type definitions -->
+    <types>
+        <struct name="TextLine">
+            <member name="value" type="string" stringMaxLength="2048"/>
+        </struct>
+    </types>
+
+    <!-- adapter entry points are defined here -->
+    <adapter_library name="adapters">
+        <adapter_plugin name="simple_file">
+            <!-- Replace with your location of the shared library -->
+            <dll>c:\adapters\SimpleFileAdapter\Release\SimpleFileAdapter.dll</dll>
+            <create_function>SimpleFileAdapter_create</create_function>
+        </adapter_plugin>
+
+        <java_adapter_plugin name="tester">
+            <!-- This class is contained in rtirsadapter.jar -->
+            <class_name>com.rti.routingservice.adapter.test.TestAdapter</class_name>
+        </java_adapter_plugin>
+
+    </adapter_library>
+
+    <!-- ****************************************************************** -->
+    <!-- ****************************************************************** -->
+
+    <routing_service name="test_ok">
+
+        <annotation>
+            <documentation>
+                Test the simple file adapter (expected to pass). To run this test run routing service as follows:
+                rtiroutingservice -cfgFile &lt;ThisFile&gt; -cfgName test_ok -stopAfter 10 -verbosity 3
+            </documentation>
+        </annotation>
+
+
+        <domain_route name="file2test">
+
+            <connection_1 plugin_name="adapters::simple_file">
+                <registered_type name="TextLine" type_name="TextLine"/>
+                <property>
+                    <value>
+                        <element>
+                            <name>directory</name>
+                            <value>example/testing</value>
+                        </element>
+                    </value>
+                </property>
+            </connection_1>
+
+            <connection_2 plugin_name="adapters::tester">
+                <registered_type name="TextLine" type_name="TextLine"/>
+                <property>
+                    <!-- We indicate that we are expecting one writer (for the route below)
+                         to be created; otherwise the test will fail. -->
+                    <value>
+                        <element>
+                            <name>ExpectedWriterCount</name>
+                            <value>1</value>
+                        </element>
+                    </value>
+                </property>
+            </connection_2>
+
+            <session name="s">
+
+                <route name="test_route1">
+                    <!-- The input reads from the file-->
+                    <input connection="1">
+                        <!-- This file contains the samples
+                             expected by the output test adapter -->
+                        <stream_name>HelloWorldOK</stream_name>
+                        <registered_type_name>TextLine</registered_type_name>
+                    </input>
+
+                    <!-- The output is the tester -->
+                    <output>
+                        <creation_mode>IMMEDIATE</creation_mode>
+                        <stream_name>HelloWorldOK</stream_name>
+                        <registered_type_name>TextLine</registered_type_name>
+                        <property>
+                            <value>
+                                <!-- Indicate how many samples we need to 
+				     receive to pass -->
+                                <element>
+                                    <name>MinExpectedSamples</name>
+                                    <value>2</value>
+                                </element>
+                                <element>
+                                    <name>MaxExpectedSamples</name>
+                                    <value>2</value>
+                                </element>
+                                <!-- We will count only the samples
+				     that match this value for the field member2 -->
+                                <element>
+                                    <name>TestStringField</name>
+                                    <value>value</value>
+                                </element>
+                                <element>
+                                    <name>TestStringValue</name>
+                                    <value>Hello World!</value>
+                                </element>
+                                <!-- We also support filtering by long field:
+				<element>
+				    <name>TestLongField</name>
+				    <value>a_long_field</value>
+				</element>
+				<element>
+				    <name>TestLongValue</name>
+				    <value>999</value>
+				</element> 
+				-->
+                                <!-- And this property can simulate
+				     some processing time for every matching
+				     sample written here (milliseconds)
+				<element>
+				    <name>SleepPerSample</name>
+				    <value>100</value>
+				</element>				
+				-->
+                            </value>
+                        </property>
+                    </output>
+
+                </route>
+            </session>
+
+        </domain_route>
+
+    </routing_service>
+
+    <!-- ****************************************************************** -->
+
+    <routing_service name="test_fail">
+
+        <annotation>
+            <documentation>
+                Test the simple file adapter (expected to fail). To run this test run routing service as follows:
+                rtiroutingservice -cfgFile &lt;ThisFile&gt; -cfgName test_fail -stopAfter 10 -verbosity 3
+            </documentation>
+        </annotation>
+
+
+        <domain_route name="file2test">
+
+            <connection_1 plugin_name="adapters::simple_file">
+                <registered_type name="TextLine" type_name="TextLine"/>
+                <property>
+                    <value>
+                        <element>
+                            <name>directory</name>
+                            <value>example/testing</value>
+                        </element>
+                    </value>
+                </property>
+            </connection_1>
+
+            <connection_2 plugin_name="adapters::tester">
+                <registered_type name="TextLine" type_name="TextLine"/>
+                <property>
+                    <!-- We indicate that we are expecting one writer (for the route below)
+                         to be created; otherwise the test will fail. -->
+                    <value>
+                        <element>
+                            <name>ExpectedWriterCount</name>
+                            <value>2</value>
+                        </element>
+                    </value>
+                </property>
+            </connection_2>
+
+            <session name="s">
+
+                <route name="test_route_fail">
+                    <!-- The input reads from the file-->
+                    <input connection="1">
+                        <!-- This file doesn't contain the samples
+                             expected by the output test adapter -->
+                        <stream_name>HelloWorldFail</stream_name>
+                        <registered_type_name>TextLine</registered_type_name>
+                    </input>
+
+                    <!-- The output is the tester -->
+                    <output>
+                        <creation_mode>IMMEDIATE</creation_mode>
+                        <stream_name>HelloWorldFail</stream_name>
+                        <registered_type_name>TextLine</registered_type_name>
+                        <property>
+                            <value>
+                                <element>
+                                    <name>MinExpectedSamples</name>
+                                    <value>2</value>
+                                </element>
+                                <element>
+                                    <name>MaxExpectedSamples</name>
+                                    <value>2</value>
+                                </element>
+                                <element>
+                                    <name>TestStringField</name>
+                                    <value>value</value>
+                                </element>
+                                <element>
+                                    <name>TestStringValue</name>
+                                    <value>Hello World!</value>
+                                </element>
+                            </value>
+                        </property>
+                    </output>
+
+                </route>
+
+                <route name="test_route_ok">
+                    <!-- The input reads from the file-->
+                    <input connection="1">
+                        <stream_name>HelloWorldOK</stream_name>
+                        <registered_type_name>TextLine</registered_type_name>
+                    </input>
+
+                    <!-- The output is the tester -->
+                    <output>
+                        <creation_mode>IMMEDIATE</creation_mode>
+                        <stream_name>HelloWorldOK</stream_name>
+                        <registered_type_name>TextLine</registered_type_name>
+                        <property>
+                            <value>
+                                <element>
+                                    <name>MinExpectedSamples</name>
+                                    <value>2</value>
+                                </element>
+                                <element>
+                                    <name>MaxExpectedSamples</name>
+                                    <value>2</value>
+                                </element>
+                                <element>
+                                    <name>TestStringField</name>
+                                    <value>value</value>
+                                </element>
+                                <element>
+                                    <name>TestStringValue</name>
+                                    <value>Hello World!</value>
+                                </element>
+                            </value>
+                        </property>
+                    </output>
+
+                </route>
+            </session>
+
+        </domain_route>
+
+    </routing_service>
+
+
+    <!-- ****************************************************************** -->
+
+    <routing_service name="test_dds_shapes">
+
+        <annotation>
+            <documentation>
+                Use the test adapter with RTI Shapes Demo (Squares)
+            </documentation>
+        </annotation>
+
+
+        <domain_route name="dds2test">
+
+            <participant_1>
+                <domain_id>0</domain_id>
+            </participant_1>
+
+            <connection_2 plugin_name="adapters::tester">
+                <property>
+                    <!-- We indicate that we are expecting one writer (for the route below)
+                         to be created; otherwise the test will fail. -->
+                    <value>
+                        <element>
+                            <name>ExpectedWriterCount</name>
+                            <value>1</value>
+                        </element>
+                    </value>
+                </property>
+            </connection_2>
+
+            <session name="s">
+
+                <route name="square2test">
+                    <route_types>1</route_types>
+                    <!-- The input reads from the file-->
+                    <dds_input participant="1">
+                        <!-- This file contains the samples
+                             expected by the output test adapter -->
+                        <topic_name>Square</topic_name>
+                        <registered_type_name>ShapeType</registered_type_name>
+                    </dds_input>
+
+                    <!-- The output is the tester -->
+                    <output>
+                        <creation_mode>IMMEDIATE</creation_mode>
+                        <stream_name>SquareTest</stream_name>
+                        <registered_type_name>ShapeType</registered_type_name>
+                        <property>
+                            <value>
+                                <!-- Indicate how many samples we need to 
+				     receive to pass -->
+                                <element>
+                                    <name>MinExpectedSamples</name>
+                                    <value>2</value>
+                                </element>
+                                <element>
+                                    <name>MaxExpectedSamples</name>
+                                    <value>200</value>
+                                </element>
+                                <!-- We will count only the samples
+				     that match this value for the field member2 -->
+                                <element>
+                                    <name>TestStringField</name>
+                                    <value>color</value>
+                                </element>
+                                <element>
+                                    <name>TestStringValue</name>
+                                    <value>RED</value>
+                                </element>
+                                <!-- We also support filtering by long field:
+				<element>
+				    <name>TestLongField</name>
+				    <value>a_long_field</value>
+				</element>
+				<element>
+				    <name>TestLongValue</name>
+				    <value>999</value>
+				</element> 
+				-->
+                                <!-- And this property can simulate
+				     some processing time for every matching
+				     sample written here (milliseconds)
+				<element>
+				    <name>SleepPerSample</name>
+				    <value>100</value>
+				</element>				
+				-->
+                            </value>
+                        </property>
+                    </output>
+
+                </route>
+            </session>
+
+        </domain_route>
+
+    </routing_service>
+
+</dds>
+
